@@ -17,7 +17,7 @@ git add -A
 git commit -m 'deploy'
 
 # если вы публикуете по адресу https://<USERNAME>.github.io
-git push -f https://github.com/Hastes/semen-platformer-prod.git master
+git push -f https://github.com/Hastes/pfdo-platformer-prod.git master
 
 # если вы публикуете по адресу https://<USERNAME>.github.io/<REPO>
 # git push -f git@github.com:<USERNAME>/<REPO>.git master:gh-pages
