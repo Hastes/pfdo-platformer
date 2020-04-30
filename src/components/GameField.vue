@@ -43,6 +43,11 @@ const TEXTURES = {
 	emenyFrames: emenyFrames,
 };
 
+const ENEMY_TYPES = {
+  developer: 0,
+  client: 1,
+}
+
 export default {
 	components: {
 		GameOver,
@@ -53,12 +58,13 @@ export default {
     let counter = 1000;
     const instance = this;
     const scalingIntervalF = function() {
-      counter = 1000 - instance.score * 10;
+      counter = 1000 - instance.score * 5;
       console.log(counter);
       instance.generateEnemy();
       setTimeout(scalingIntervalF, counter);
     }
     setTimeout(scalingIntervalF, counter);
+    this.drawMode();
 	},
 	beforeDestroy() {
 		window.removeEventListener("keydown", this.handleKeyDown.bind(this));
@@ -137,7 +143,8 @@ export default {
 				certificate = new PIXI.Sprite(TEXTURES.money);
 			}
 			certificate.scale.set(0.1);
-			certificate.anchor.set(0.5);
+      certificate.anchor.set(0.5);
+      certificate.type = this.mode.type;
 			certificate.x = this.player.x;
 			certificate.y = this.player.y;
 			certificate.interactive = true;
@@ -157,12 +164,13 @@ export default {
 				if (
 					(certificate.x < enemy.x) & (certificate.y === enemy.y) &&
 					!certificate.isUsed &&
-					!enemy.destroyed
+          !enemy.destroyed &&
+          enemy.type === certificate.type
 				) {
 					enemy.destroyed = true;
 					certificate.isUsed = true;
 					this.score++;
-					this.scoreText.text = `Выполнено: ${this.score}`;
+          this.scoreText.text = `Выполнено: ${this.score}`;
 					this.app.stage.removeChild(enemy);
 					this.app.stage.removeChild(certificate);
 				}
@@ -175,18 +183,24 @@ export default {
 			this.addEnemy(randomPosition);
 		},
 		addEnemy(randomPosition) {
-			const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
+      const type =  Math.random() > 0.5 ? ENEMY_TYPES.developer : ENEMY_TYPES.client;
+      
+      const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
+      // Надо заменить на подбор спрайта
+      if (type === ENEMY_TYPES.client) {
+        enemy.scale.set(1);
+      } else { enemy.scale.set(0.5) }
+      enemy.type = type;
 			enemy.animationSpeed = 0.1;
 			enemy.play();
 			enemy.anchor.set(0.5);
-			enemy.scale.set(0.5);
 			enemy.x = 0;
 			enemy.y = this.rowHeight * randomPosition;
       enemy.interactive = true;
       enemy.speed = Math.random() * 2;
 			this.app.stage.addChild(enemy);
 			this.app.ticker.add(() => {
-				enemy.x += 10 * enemy.speed + this.score / 4;
+				enemy.x += 10 * enemy.speed + this.score / 100;
 				if (enemy.x > this.player.x && !enemy.destroyed) {
           this.gameOver();
 				}
@@ -201,7 +215,8 @@ export default {
 				this.mode = new PIXI.Sprite(TEXTURES.certificate);
 			} else if (mode === 1) {
 				this.mode = new PIXI.Sprite(TEXTURES.money);
-			}
+      }
+      this.mode.type = mode;
 			this.mode.scale.set(0.1);
 			this.mode.anchor.set(0.5);
 			this.mode.x = this.player.x;
