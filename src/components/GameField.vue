@@ -49,8 +49,16 @@ export default {
 	},
 	mounted() {
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
-		this.initCanvas();
-		setInterval(() => this.generateEnemy(), 1000);
+    this.initCanvas();
+    let counter = 1000;
+    const instance = this;
+    const scalingIntervalF = function() {
+      counter = 1000 - instance.score * 10;
+      console.log(counter);
+      instance.generateEnemy();
+      setTimeout(scalingIntervalF, counter);
+    }
+    setTimeout(scalingIntervalF, counter);
 	},
 	beforeDestroy() {
 		window.removeEventListener("keydown", this.handleKeyDown.bind(this));
@@ -170,17 +178,17 @@ export default {
 			const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
 			enemy.animationSpeed = 0.1;
 			enemy.play();
-			enemy.tint = Math.random() * 0xffffff;
 			enemy.anchor.set(0.5);
 			enemy.scale.set(0.5);
 			enemy.x = 0;
 			enemy.y = this.rowHeight * randomPosition;
-			enemy.interactive = true;
+      enemy.interactive = true;
+      enemy.speed = Math.random() * 2;
 			this.app.stage.addChild(enemy);
 			this.app.ticker.add(() => {
-				enemy.x += 10;
+				enemy.x += 10 * enemy.speed + this.score / 4;
 				if (enemy.x > this.player.x && !enemy.destroyed) {
-					this.gameOver();
+          this.gameOver();
 				}
 			});
 			this.enemiesPoll.push(enemy);
