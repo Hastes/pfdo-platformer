@@ -29,7 +29,7 @@ for (let i = 0; i < 1; i++) {
 
 const emenyFrames = [];
 for (let i = 1; i < 6; i++) {
-	emenyFrames.push(PIXI.Texture.from(require(`@/assets/semyon/client${i}.png`)));
+	emenyFrames.push(PIXI.Texture.from(require(`@/assets/client/client${i}.png`)));
 }
 const TEXTURES = {
 	logo: PIXI.Texture.from(require("@/assets/certificate.png")),
