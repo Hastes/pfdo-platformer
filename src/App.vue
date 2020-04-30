@@ -1,28 +1,27 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+<template lang="pug">
+#app
+  template(v-if="!isGameStarted")
+    start-menu(@start="isGameStarted = true")
+  template(v-else)
+    game-field
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import StartMenu from './components/StartMenu.vue';
+import GameField from './components/GameField.vue';
+
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
-}
+    StartMenu,
+    GameField,
+  },
+  data() {
+    return {
+      isGameStarted: false,
+    };
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
