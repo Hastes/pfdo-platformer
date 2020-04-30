@@ -1,10 +1,11 @@
 <template lang="pug">
 .start-menu
-  pfdo-game-logo
-  .text-center
-    button(@click="$emit('start')") Новая игра
-  .text-center
-    button Пожертвовать на развитие
+  .elements
+    pfdo-game-logo
+    .text-center
+      button(@click="$emit('start')") Новая игра
+    .text-center
+      button Пожертвовать на развитие
 </template>
 
 <script>
@@ -18,3 +19,13 @@ export default {
   }
 }
 </script>
+
+
+<style lang="scss" scoped>
+.start-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+</style>
