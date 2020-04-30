@@ -69,24 +69,27 @@ export default {
 	methods: {
 		initCanvas() {
 			const app = new PIXI.Application({
-				height: window.innerHeight - 100,
-				width: window.innerWidth - 100,
+				height: window.innerHeight,
+				width: window.innerWidth,
 				transparent: true,
 				antialiasing: true,
 			});
 			document.getElementById("gameField").appendChild(app.view);
+
 			const player = new PIXI.AnimatedSprite(TEXTURES.player);
 			const rowHeight = Math.round(app.screen.height / 4);
-			const scoreText = new PIXI.Text(`Выполнено: ${this.score}`, { fontSize: 24 });
+			const scoreText = new PIXI.Text(`Выполнено: ${this.score}`, {
+				fontSize: 24,
+			});
 			scoreText.x = 20;
 			scoreText.y = 20;
-			app.stage.addChild(scoreText);
 			player.anchor.set(0.5);
 			player.scale.set(0.4);
 			player.x = app.screen.width - 100;
 			player.animationSpeed = 0.15;
 			player.play();
 			player.y = rowHeight;
+			app.stage.addChild(scoreText);
 			app.stage.addChild(player);
 
 			player.interactive = true;
@@ -112,12 +115,12 @@ export default {
 			}
 		},
 		moveDown() {
-			if (this.player.y < 435) {
+			if (this.player.y < this.rowHeight * 3) {
 				this.player.y += this.rowHeight;
 			}
 		},
 		moveUp() {
-			if (this.player.y > 225) {
+			if (this.player.y > this.rowHeight) {
 				this.player.y -= this.rowHeight;
 			}
 		},
