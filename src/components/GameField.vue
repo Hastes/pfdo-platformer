@@ -77,7 +77,7 @@ export default {
 			document.getElementById("gameField").appendChild(app.view);
 			const player = new PIXI.AnimatedSprite(TEXTURES.player);
 			const rowHeight = Math.round(app.screen.height / 4);
-			const scoreText = new PIXI.Text(`Клиенты: ${this.score}`, { fontSize: 24 });
+			const scoreText = new PIXI.Text(`Выполнено: ${this.score}`, { fontSize: 24 });
 			scoreText.x = 20;
 			scoreText.y = 20;
 			app.stage.addChild(scoreText);
@@ -154,7 +154,7 @@ export default {
 					enemy.destroyed = true;
 					certificate.isUsed = true;
 					this.score++;
-					this.scoreText.text = `Клиенты: ${this.score}`;
+					this.scoreText.text = `Выполнено: ${this.score}`;
 					this.app.stage.removeChild(enemy);
 					this.app.stage.removeChild(certificate);
 				}
