@@ -12,10 +12,12 @@ import GameOver from "./GameOver.vue";
 const DOWN_KEYCODES = [83, 40];
 const UP_KEYCODES = [87, 38];
 const DROP_CERTIFICATE_KEYCODES = [32];
+const RIGHT_ARROW_KEYCODES = [37];
 
 const playerFrames = [];
 const playerFramesDropped = [];
 const emenyFrames = [];
+let mode = 0;
 
 for (let i = 0; i < 4; i++) {
 	playerFrames.push(
@@ -35,6 +37,7 @@ for (let i = 1; i < 6; i++) {
 
 const TEXTURES = {
 	certificate: PIXI.Texture.from(require("@/assets/certificate.png")),
+	money: PIXI.Texture.from(require("@/assets/money.png")),
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
 	emenyFrames: emenyFrames,
@@ -56,6 +59,7 @@ export default {
 		return {
 			app: null,
 			player: null,
+			mode: null,
 			scoreText: null,
 			isGameOver: false,
 			enemiesPoll: [],
@@ -102,6 +106,10 @@ export default {
 			if (DROP_CERTIFICATE_KEYCODES.includes(event.keyCode)) {
 				this.dropCertificate();
 			}
+			if (RIGHT_ARROW_KEYCODES.includes(event.keyCode)) {
+				mode = mode === 0 ? 1 : 0;
+				this.drawMode();
+			}
 		},
 		moveDown() {
 			if (this.player.y < 435) {
@@ -114,7 +122,12 @@ export default {
 			}
 		},
 		dropCertificate() {
-			const certificate = new PIXI.Sprite(TEXTURES.certificate);
+			let certificate = null;
+			if (mode === 0) {
+				certificate = new PIXI.Sprite(TEXTURES.certificate);
+			} else if (mode === 1) {
+				certificate = new PIXI.Sprite(TEXTURES.money);
+			}
 			certificate.scale.set(0.1);
 			certificate.anchor.set(0.5);
 			certificate.x = this.player.x;
@@ -171,6 +184,22 @@ export default {
 				}
 			});
 			this.enemiesPoll.push(enemy);
+		},
+		drawMode() {
+			if (this.mode !== null) {
+				this.mode.destroy();
+			}
+			if (mode === 0) {
+				this.mode = new PIXI.Sprite(TEXTURES.certificate);
+			} else if (mode === 1) {
+				this.mode = new PIXI.Sprite(TEXTURES.money);
+			}
+			this.mode.scale.set(0.1);
+			this.mode.anchor.set(0.5);
+			this.mode.x = this.player.x;
+			this.mode.y = 50;
+			this.mode.interactive = false;
+			this.app.stage.addChild(this.mode);
 		},
 		gameOver() {
 			this.app.stop();
