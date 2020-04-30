@@ -16,7 +16,8 @@ const RIGHT_ARROW_KEYCODES = [37];
 
 const playerFrames = [];
 const playerFramesDropped = [];
-const emenyFrames = [];
+const clientFrames = [];
+const programmerFrames = [];
 let mode = 0;
 
 for (let i = 0; i < 4; i++) {
@@ -32,7 +33,14 @@ for (let i = 0; i < 1; i++) {
 }
 
 for (let i = 1; i < 6; i++) {
-	emenyFrames.push(PIXI.Texture.from(require(`@/assets/client/client${i}.png`)));
+	clientFrames.push(
+		PIXI.Texture.from(require(`@/assets/client/client${i}.png`)),
+	);
+}
+for (let i = 0; i < 4; i++) {
+	programmerFrames.push(
+		PIXI.Texture.from(require(`@/assets/programmer/body${i}.png`)),
+	);
 }
 
 const TEXTURES = {
@@ -40,13 +48,14 @@ const TEXTURES = {
 	money: PIXI.Texture.from(require("@/assets/money.png")),
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
-	emenyFrames: emenyFrames,
+	clientFrames,
+	programmerFrames,
 };
 
 const ENEMY_TYPES = {
-  developer: 0,
-  client: 1,
-}
+	developer: 0,
+	client: 1,
+};
 
 export default {
 	components: {
@@ -54,17 +63,17 @@ export default {
 	},
 	mounted() {
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
-    this.initCanvas();
-    let counter = 1000;
-    const instance = this;
-    const scalingIntervalF = function() {
-      counter = 1000 - instance.score * 5;
-      console.log(counter);
-      instance.generateEnemy();
-      setTimeout(scalingIntervalF, counter);
-    }
-    setTimeout(scalingIntervalF, counter);
-    this.drawMode();
+		this.initCanvas();
+		let counter = 1000;
+		const instance = this;
+		const scalingIntervalF = function () {
+			counter = 1000 - instance.score * 5;
+			console.log(counter);
+			instance.generateEnemy();
+			setTimeout(scalingIntervalF, counter);
+		};
+		setTimeout(scalingIntervalF, counter);
+		this.drawMode();
 	},
 	beforeDestroy() {
 		window.removeEventListener("keydown", this.handleKeyDown.bind(this));
@@ -103,6 +112,27 @@ export default {
 			player.animationSpeed = 0.15;
 			player.play();
 			player.y = rowHeight;
+
+			const sky = PIXI.Sprite.from(PIXI.Texture.WHITE);
+			sky.width = app.screen.width;
+			sky.height = rowHeight;
+			sky.tint = 0x80a8e7;
+			app.stage.addChild(sky);
+			for (let i = 1; i < 4; i++) {
+				const rectangle = PIXI.Sprite.from(PIXI.Texture.WHITE);
+				rectangle.width = app.screen.width;
+				rectangle.y = rowHeight * i;
+				rectangle.height = rowHeight;
+				rectangle.tint = 0x7bff3d;
+				app.stage.addChild(rectangle);
+				const line = PIXI.Sprite.from(PIXI.Texture.WHITE);
+				line.width = app.screen.width;
+				line.y = rowHeight * i;
+				line.height = 5;
+				line.tint = 0x80a8e7;
+				app.stage.addChild(line);
+			}
+
 			app.stage.addChild(scoreText);
 			app.stage.addChild(player);
 
@@ -112,6 +142,7 @@ export default {
 			this.player = player;
 			this.scoreText = scoreText;
 			this.rowHeight = rowHeight;
+			this.drawMode();
 		},
 		handleKeyDown(event) {
 			if (DOWN_KEYCODES.includes(event.keyCode)) {
@@ -146,8 +177,8 @@ export default {
 				certificate = new PIXI.Sprite(TEXTURES.money);
 			}
 			certificate.scale.set(0.1);
-      certificate.anchor.set(0.5);
-      certificate.type = this.mode.type;
+			certificate.anchor.set(0.5);
+			certificate.type = this.mode.type;
 			certificate.x = this.player.x;
 			certificate.y = this.player.y;
 			certificate.interactive = true;
@@ -167,13 +198,13 @@ export default {
 				if (
 					(certificate.x < enemy.x) & (certificate.y === enemy.y) &&
 					!certificate.isUsed &&
-          !enemy.destroyed &&
-          enemy.type === certificate.type
+					!enemy.destroyed &&
+					enemy.type === certificate.type
 				) {
 					enemy.destroyed = true;
 					certificate.isUsed = true;
 					this.score++;
-          this.scoreText.text = `Выполнено: ${this.score}`;
+					this.scoreText.text = `Выполнено: ${this.score}`;
 					this.app.stage.removeChild(enemy);
 					this.app.stage.removeChild(certificate);
 				}
@@ -186,26 +217,30 @@ export default {
 			this.addEnemy(randomPosition);
 		},
 		addEnemy(randomPosition) {
-      const type =  Math.random() > 0.5 ? ENEMY_TYPES.developer : ENEMY_TYPES.client;
-      
-      const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
-      // Надо заменить на подбор спрайта
-      if (type === ENEMY_TYPES.client) {
-        enemy.scale.set(1);
-      } else { enemy.scale.set(0.5) }
-      enemy.type = type;
+			const type =
+				Math.random() > 0.5 ? ENEMY_TYPES.developer : ENEMY_TYPES.client;
+
+			let enemy = null;
+			// Надо заменить на подбор спрайта
+			if (type === ENEMY_TYPES.client) {
+				enemy = new PIXI.AnimatedSprite(TEXTURES.programmerFrames);
+			} else {
+				enemy = new PIXI.AnimatedSprite(TEXTURES.clientFrames);
+			}
+			enemy.type = type;
 			enemy.animationSpeed = 0.1;
 			enemy.play();
 			enemy.anchor.set(0.5);
+			enemy.scale.set(0.5);
 			enemy.x = 0;
 			enemy.y = this.rowHeight * randomPosition;
-      enemy.interactive = true;
-      enemy.speed = Math.random() * 2;
+			enemy.interactive = true;
+			enemy.speed = Math.max(1, Math.random() * 1.3);
 			this.app.stage.addChild(enemy);
 			this.app.ticker.add(() => {
 				enemy.x += 10 * enemy.speed + this.score / 100;
 				if (enemy.x > this.player.x && !enemy.destroyed) {
-          this.gameOver();
+					this.gameOver();
 				}
 			});
 			this.enemiesPoll.push(enemy);
@@ -218,8 +253,8 @@ export default {
 				this.mode = new PIXI.Sprite(TEXTURES.certificate);
 			} else if (mode === 1) {
 				this.mode = new PIXI.Sprite(TEXTURES.money);
-      }
-      this.mode.type = mode;
+			}
+			this.mode.type = mode;
 			this.mode.scale.set(0.1);
 			this.mode.anchor.set(0.5);
 			this.mode.x = this.player.x;
@@ -236,10 +271,10 @@ export default {
 		gameStart() {
 			document.getElementById("gameField").style.display = "block";
 			document.getElementById("gameField").innerHTML = "";
+			this.score = 0;
 			this.app.destroy();
 			this.initCanvas();
 			this.isGameOver = false;
-			this.score = 0;
 		},
 	},
 };
