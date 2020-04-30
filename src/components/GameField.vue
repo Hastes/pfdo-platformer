@@ -1,44 +1,49 @@
 <template lang="pug">
 div
   template(v-if="isGameOver")
-    h1 Игра окончена
+    game-over(:score='score' :gameStart="gameStart")
   #gameField
 </template>
 
 <script>
 import * as PIXI from "pixi.js";
-import "@/assets/logo.png";
+import GameOver from "./GameOver.vue";
 
 const DOWN_KEYCODES = [83, 40];
 const UP_KEYCODES = [87, 38];
 const DROP_CERTIFICATE_KEYCODES = [32];
 
 const playerFrames = [];
+const playerFramesDropped = [];
+const emenyFrames = [];
+
 for (let i = 0; i < 4; i++) {
 	playerFrames.push(
 		PIXI.Texture.from(require(`@/assets/semyon/running${i}.png`)),
 	);
 }
 
-const playerFramesDropped = [];
 for (let i = 0; i < 1; i++) {
 	playerFramesDropped.push(
 		PIXI.Texture.from(require(`@/assets/semyon/certificate${i}.png`)),
 	);
 }
 
-const emenyFrames = [];
 for (let i = 1; i < 6; i++) {
 	emenyFrames.push(PIXI.Texture.from(require(`@/assets/semyon/client${i}.png`)));
 }
+
 const TEXTURES = {
-	logo: PIXI.Texture.from(require("@/assets/certificate.png")),
+	certificate: PIXI.Texture.from(require("@/assets/certificate.png")),
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
 	emenyFrames: emenyFrames,
 };
 
 export default {
+	components: {
+		GameOver,
+	},
 	mounted() {
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
 		this.initCanvas();
@@ -51,8 +56,10 @@ export default {
 		return {
 			app: null,
 			player: null,
+			scoreText: null,
 			isGameOver: false,
 			enemiesPoll: [],
+			score: 0,
 		};
 	},
 	methods: {
@@ -66,11 +73,14 @@ export default {
 			document.getElementById("gameField").appendChild(app.view);
 			const player = new PIXI.AnimatedSprite(TEXTURES.player);
 			const rowHeight = Math.round(app.screen.height / 4);
-
+			const scoreText = new PIXI.Text(`Клиенты: ${this.score}`, { fontSize: 24 });
+			scoreText.x = 20;
+			scoreText.y = 20;
+			app.stage.addChild(scoreText);
 			player.anchor.set(0.5);
 			player.scale.set(0.4);
 			player.x = app.screen.width - 100;
-			player.animationSpeed = 0.2;
+			player.animationSpeed = 0.15;
 			player.play();
 			player.y = rowHeight;
 			app.stage.addChild(player);
@@ -79,6 +89,7 @@ export default {
 
 			this.app = app;
 			this.player = player;
+			this.scoreText = scoreText;
 			this.rowHeight = rowHeight;
 		},
 		handleKeyDown(event) {
@@ -93,13 +104,17 @@ export default {
 			}
 		},
 		moveDown() {
-			this.player.y += this.rowHeight;
+			if (this.player.y < 435) {
+				this.player.y += this.rowHeight;
+			}
 		},
 		moveUp() {
-			this.player.y -= this.rowHeight;
+			if (this.player.y > 225) {
+				this.player.y -= this.rowHeight;
+			}
 		},
 		dropCertificate() {
-			const certificate = new PIXI.Sprite(TEXTURES.logo);
+			const certificate = new PIXI.Sprite(TEXTURES.certificate);
 			certificate.scale.set(0.1);
 			certificate.anchor.set(0.5);
 			certificate.x = this.player.x;
@@ -125,6 +140,8 @@ export default {
 				) {
 					enemy.destroyed = true;
 					certificate.isUsed = true;
+					this.score++;
+					this.scoreText.text = `Клиенты: ${this.score}`;
 					this.app.stage.removeChild(enemy);
 					this.app.stage.removeChild(certificate);
 				}
@@ -138,7 +155,7 @@ export default {
 		},
 		addEnemy(randomPosition) {
 			const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
-			enemy.animationSpeed = 0.2;
+			enemy.animationSpeed = 0.1;
 			enemy.play();
 			enemy.tint = Math.random() * 0xffffff;
 			enemy.anchor.set(0.5);
@@ -149,16 +166,25 @@ export default {
 			this.app.stage.addChild(enemy);
 			this.app.ticker.add(() => {
 				enemy.x += 10;
-				// if (enemy.x > this.player.x && !enemy.destroyed) {
-				// 	this.gameOver();
-				// }
+				if (enemy.x > this.player.x && !enemy.destroyed) {
+					this.gameOver();
+				}
 			});
 			this.enemiesPoll.push(enemy);
 		},
 		gameOver() {
 			this.app.stop();
 			this.enemiesPoll = [];
+			this.isGameOver = true;
 			document.getElementById("gameField").style.display = "none";
+		},
+		gameStart() {
+			document.getElementById("gameField").style.display = "block";
+			document.getElementById("gameField").innerHTML = "";
+			this.app.destroy();
+			this.initCanvas();
+			this.isGameOver = false;
+			this.score = 0;
 		},
 	},
 };
