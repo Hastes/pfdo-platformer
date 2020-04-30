@@ -28,12 +28,14 @@ for (let i = 0; i < 1; i++) {
 }
 
 const emenyFrames = [];
-
+for (let i = 1; i < 6; i++) {
+	emenyFrames.push(PIXI.Texture.from(require(`@/assets/semyon/client${i}.png`)));
+}
 const TEXTURES = {
 	logo: PIXI.Texture.from(require("@/assets/certificate.png")),
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
-	// emenyFrames: PIXI.AnimatedSprite.from(emenyFrames),
+	emenyFrames: emenyFrames,
 };
 
 export default {
@@ -98,7 +100,7 @@ export default {
 		},
 		dropCertificate() {
 			const certificate = new PIXI.Sprite(TEXTURES.logo);
-			certificate.scale.set(0.3);
+			certificate.scale.set(0.1);
 			certificate.anchor.set(0.5);
 			certificate.x = this.player.x;
 			certificate.y = this.player.y;
@@ -135,7 +137,9 @@ export default {
 			this.addEnemy(randomPosition);
 		},
 		addEnemy(randomPosition) {
-			const enemy = new PIXI.Sprite(TEXTURES.logo);
+			const enemy = new PIXI.AnimatedSprite(TEXTURES.emenyFrames);
+			enemy.animationSpeed = 0.2;
+			enemy.play();
 			enemy.tint = Math.random() * 0xffffff;
 			enemy.anchor.set(0.5);
 			enemy.scale.set(0.5);
