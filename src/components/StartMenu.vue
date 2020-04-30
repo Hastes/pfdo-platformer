@@ -11,11 +11,14 @@
     .controls
       .item
         .item-button space
-        .item-text Отправить сертификат
+        .item-text Отправить сертификат или деньги
       .item
         .item-button &#8593;
         .item-button &#8595;
         .item-text Перемещение игрока
+      .item
+        .item-button &#8592;
+        .item-text Смена режима
 </template>
 
 <script>
@@ -77,12 +80,14 @@ export default {
 		margin-bottom: 10px;
 		&-button {
 			margin-right: 15px;
+      min-width: 20px;
 			padding: 0.5rem;
 			border: 3px solid $primary-color;
 			background-color: $light-color;
 			border-radius: 5px;
 			text-transform: uppercase;
 			font-weight: bold;
+      text-align: center;
 		}
 		&-text {
 			margin-left: auto;
