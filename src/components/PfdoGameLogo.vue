@@ -1,5 +1,5 @@
 <template lang="pug">
-h1.pfdo-game-logo PFDO Gaming
+h1.pfdo-game-logo Сертификатмэн
 </template>
 
 <style scoped lang="scss">

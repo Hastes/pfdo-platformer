@@ -17,7 +17,7 @@ const RIGHT_ARROW_KEYCODES = [37];
 const playerFrames = [];
 const playerFramesDropped = [];
 const clientFrames = [];
-const programmerFrames = [];
+const programmers = [];
 let mode = 0;
 
 for (let i = 0; i < 4; i++) {
@@ -37,10 +37,14 @@ for (let i = 1; i < 6; i++) {
 		PIXI.Texture.from(require(`@/assets/client/client${i}.png`)),
 	);
 }
-for (let i = 0; i < 4; i++) {
-	programmerFrames.push(
-		PIXI.Texture.from(require(`@/assets/programmer/body${i}.png`)),
-	);
+for (let k = 0; k < 4; k++) {
+  const programmerFrames = [];
+  for (let i = 0; i < 4; i++) {
+    programmerFrames.push(
+      PIXI.Texture.from(require(`@/assets/programmer/programmer${k}${i}.png`)),
+    );
+  }
+  programmers[k] = programmerFrames
 }
 
 const TEXTURES = {
@@ -49,7 +53,7 @@ const TEXTURES = {
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
 	clientFrames,
-	programmerFrames,
+  programmers,
 };
 
 const ENEMY_TYPES = {
@@ -220,7 +224,8 @@ export default {
 
 			let enemy = null;
 			if (type === ENEMY_TYPES.client) {
-				enemy = new PIXI.AnimatedSprite(TEXTURES.programmerFrames);
+        const programmerNumber = Math.floor(Math.random() * Math.floor(3));
+				enemy = new PIXI.AnimatedSprite(TEXTURES.programmers[programmerNumber]);
 			} else {
 				enemy = new PIXI.AnimatedSprite(TEXTURES.clientFrames);
 			}
