@@ -68,7 +68,6 @@ export default {
 		const instance = this;
 		const scalingIntervalF = function () {
 			counter = 1000 - instance.score * 5;
-			console.log(counter);
 			instance.generateEnemy();
 			setTimeout(scalingIntervalF, counter);
 		};
@@ -123,7 +122,6 @@ export default {
 				rectangle.width = app.screen.width;
 				rectangle.y = rowHeight * i;
 				rectangle.height = rowHeight;
-				rectangle.tint = 0x7bff3d;
 				app.stage.addChild(rectangle);
 				const line = PIXI.Sprite.from(PIXI.Texture.WHITE);
 				line.width = app.screen.width;
@@ -221,7 +219,6 @@ export default {
 				Math.random() > 0.5 ? ENEMY_TYPES.developer : ENEMY_TYPES.client;
 
 			let enemy = null;
-			// Надо заменить на подбор спрайта
 			if (type === ENEMY_TYPES.client) {
 				enemy = new PIXI.AnimatedSprite(TEXTURES.programmerFrames);
 			} else {
@@ -235,10 +232,10 @@ export default {
 			enemy.x = 0;
 			enemy.y = this.rowHeight * randomPosition;
 			enemy.interactive = true;
-			enemy.speed = Math.max(1, Math.random() * 1.3);
+			enemy.speed = Math.max(1, Math.random() * 1.3) + this.score / 10;
 			this.app.stage.addChild(enemy);
 			this.app.ticker.add(() => {
-				enemy.x += 10 * enemy.speed + this.score / 100;
+				enemy.x += 5 * enemy.speed;
 				if (enemy.x > this.player.x && !enemy.destroyed) {
 					this.gameOver();
 				}
