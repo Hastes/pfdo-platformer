@@ -7,6 +7,9 @@
     .text-center
       button Пожертвовать на развитие
     .text-center
+      .header-controls Описание
+      .description Вы семен и ваша цель удовлетворить как можно больше людей
+    .text-center
       .header-controls Управление
     .controls
       .item
@@ -52,6 +55,7 @@ export default {
 .text-center {
 	margin-bottom: 1rem;
 	width: 100%;
+  max-width: 320px;
 	button {
 		background-color: $light-color;
 		border: 3px solid $dark-color;

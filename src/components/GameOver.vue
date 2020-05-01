@@ -4,7 +4,10 @@
     pfdo-game-logo
     .text-center
       h1 Игра окончена
-      img.image(:src="require('../assets/semyon/fail0.png')")
+      template(v-if="count%2===0")
+        img.image(:src="require('../assets/semyon/fail0.png')")
+      template(v-else)
+        img.image(:src="require('../assets/semyon/fail1.png')")
       template(v-if="score > 10")
         p Ваш результат {{score}}. Вы справились с этим.
       template(v-else)
@@ -24,6 +27,20 @@ export default {
 	name: "GameOver",
 	components: {
 		PfdoGameLogo,
+	},
+	mounted() {
+		this.timer = setInterval(() => {
+			this.count++;
+		}, 300);
+	},
+	beforeDestroy() {
+		clearInterval(this.timer);
+	},
+	data() {
+		return {
+			count: 0,
+			timer: null,
+		};
 	},
 };
 </script>
