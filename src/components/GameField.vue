@@ -13,6 +13,7 @@ const DOWN_KEYCODES = [83, 40];
 const UP_KEYCODES = [87, 38];
 const DROP_CERTIFICATE_KEYCODES = [32];
 const RIGHT_ARROW_KEYCODES = [37];
+const DEFAULT_HEALTH_POINTS = 3;
 
 const playerFrames = [];
 const playerFramesDropped = [];
@@ -90,6 +91,8 @@ export default {
 			isGameOver: false,
 			enemiesPoll: [],
 			score: 0,
+            healthPoints: DEFAULT_HEALTH_POINTS,
+            healthPointsText: null,
 		};
 	},
 	methods: {
@@ -107,8 +110,13 @@ export default {
 			const scoreText = new PIXI.Text(`Выполнено: ${this.score}`, {
 				fontSize: 24,
 			});
+			const healthPointsText = new PIXI.Text(`Жизни: ${this.healthPoints}`, {
+                fontSize: 24,
+            });
 			scoreText.x = 20;
 			scoreText.y = 20;
+            healthPointsText.x = 200;
+            healthPointsText.y = 20;
 			player.anchor.set(0.5);
 			player.scale.set(0.4);
 			player.x = app.screen.width - 100;
@@ -137,12 +145,14 @@ export default {
 
 			app.stage.addChild(scoreText);
 			app.stage.addChild(player);
+			app.stage.addChild(healthPointsText);
 
 			player.interactive = true;
 
 			this.app = app;
 			this.player = player;
 			this.scoreText = scoreText;
+			this.healthPointsText = healthPointsText;
 			this.rowHeight = rowHeight;
 			this.drawMode();
 		},
@@ -243,6 +253,7 @@ export default {
 				enemy.x += 5 * enemy.speed;
 				if (enemy.x > this.player.x && !enemy.destroyed) {
 					this.gameOver();
+					enemy.destroyed = true;
 				}
 			});
 			this.enemiesPoll.push(enemy);
@@ -265,10 +276,17 @@ export default {
 			this.app.stage.addChild(this.mode);
 		},
 		gameOver() {
-			this.app.stop();
-			this.enemiesPoll = [];
-			this.isGameOver = true;
-			document.getElementById("gameField").style.display = "none";
+            this.healthPoints--;
+            
+            if(this.healthPoints <= 0) {
+                this.app.stop();
+                this.enemiesPoll = [];
+                this.isGameOver = true;
+                this.healthPoints = DEFAULT_HEALTH_POINTS;
+                document.getElementById("gameField").style.display = "none";
+            }
+            
+            this.healthPointsText.text = `Жизни: ${this.healthPoints}`;
 		},
 		gameStart() {
 			document.getElementById("gameField").style.display = "block";
