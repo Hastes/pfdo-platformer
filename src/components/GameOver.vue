@@ -4,14 +4,18 @@
     pfdo-game-logo
     .text-center
       h1 Игра окончена
-      template(v-if="count%2===0")
-        img.image(:src="require('../assets/semyon/fail0.png')")
-      template(v-else)
-        img.image(:src="require('../assets/semyon/fail1.png')")
-      template(v-if="score > 10")
-        p Ваш результат {{score}}. Вы справились с этим.
-      template(v-else)
+      template(v-if="score < 10")
+        template(v-if="count%2===0")
+          img.image(:src="require('../assets/semyon/fail0.png')")
+        template(v-else)
+          img.image(:src="require('../assets/semyon/fail1.png')")
         p Ваш результат {{score}}. Как-то слабо.
+      template(v-else)
+        template(v-if="count%2===0")
+          img.image(:src="require('../assets/semyon/money0.png')")
+        template(v-else)
+          img.image(:src="require('../assets/semyon/money1.png')")
+        p Ваш результат {{score}}. Молодец. Вы справились.
       .controls
         button(@click="gameStart") Попробовать снова
 </template>
