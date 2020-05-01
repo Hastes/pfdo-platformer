@@ -39,22 +39,23 @@ for (let i = 1; i < 6; i++) {
 	);
 }
 for (let k = 0; k < 4; k++) {
-  const programmerFrames = [];
-  for (let i = 0; i < 4; i++) {
-    programmerFrames.push(
-      PIXI.Texture.from(require(`@/assets/programmer/programmer${k}${i}.png`)),
-    );
-  }
-  programmers[k] = programmerFrames
+	const programmerFrames = [];
+	for (let i = 0; i < 4; i++) {
+		programmerFrames.push(
+			PIXI.Texture.from(require(`@/assets/programmer/programmer${k}${i}.png`)),
+		);
+	}
+	programmers[k] = programmerFrames;
 }
 
 const TEXTURES = {
 	certificate: PIXI.Texture.from(require("@/assets/certificate.png")),
 	money: PIXI.Texture.from(require("@/assets/money.png")),
+	heart: PIXI.Texture.from(require("@/assets/heart.png")),
 	player: playerFrames,
 	playerDropped: playerFramesDropped,
 	clientFrames,
-  programmers,
+	programmers,
 };
 
 const ENEMY_TYPES = {
@@ -87,12 +88,13 @@ export default {
 			app: null,
 			player: null,
 			mode: null,
+			lives: null,
 			scoreText: null,
 			isGameOver: false,
 			enemiesPoll: [],
 			score: 0,
-            healthPoints: DEFAULT_HEALTH_POINTS,
-            healthPointsText: null,
+			healthPoints: DEFAULT_HEALTH_POINTS,
+			healthPointsText: null,
 		};
 	},
 	methods: {
@@ -110,13 +112,13 @@ export default {
 			const scoreText = new PIXI.Text(`Выполнено: ${this.score}`, {
 				fontSize: 24,
 			});
-			const healthPointsText = new PIXI.Text(`Жизни: ${this.healthPoints}`, {
-                fontSize: 24,
-            });
+			const healthPointsText = new PIXI.Text(`${this.healthPoints}`, {
+				fontSize: 24,
+			});
 			scoreText.x = 20;
 			scoreText.y = 20;
-            healthPointsText.x = 200;
-            healthPointsText.y = 20;
+			healthPointsText.x = 220;
+			healthPointsText.y = 20;
 			player.anchor.set(0.5);
 			player.scale.set(0.4);
 			player.x = app.screen.width - 100;
@@ -154,6 +156,7 @@ export default {
 			this.scoreText = scoreText;
 			this.healthPointsText = healthPointsText;
 			this.rowHeight = rowHeight;
+			this.drawLives();
 			this.drawMode();
 		},
 		handleKeyDown(event) {
@@ -234,7 +237,7 @@ export default {
 
 			let enemy = null;
 			if (type === ENEMY_TYPES.client) {
-        const programmerNumber = Math.floor(Math.random() * Math.floor(4));
+				const programmerNumber = Math.floor(Math.random() * Math.floor(4));
 				enemy = new PIXI.AnimatedSprite(TEXTURES.programmers[programmerNumber]);
 			} else {
 				enemy = new PIXI.AnimatedSprite(TEXTURES.clientFrames);
@@ -275,18 +278,25 @@ export default {
 			this.mode.interactive = false;
 			this.app.stage.addChild(this.mode);
 		},
+		drawLives() {
+			this.lives = new PIXI.Sprite(TEXTURES.heart);
+			this.lives.scale.set(0.02);
+			this.lives.x = 190;
+			this.lives.y = 20;
+			this.lives.interactive = false;
+			this.app.stage.addChild(this.lives);
+		},
 		gameOver() {
-            this.healthPoints--;
-            
-            if(this.healthPoints <= 0) {
-                this.app.stop();
-                this.enemiesPoll = [];
-                this.isGameOver = true;
-                this.healthPoints = DEFAULT_HEALTH_POINTS;
-                document.getElementById("gameField").style.display = "none";
-            }
-            
-            this.healthPointsText.text = `Жизни: ${this.healthPoints}`;
+			this.healthPoints--;
+			if (this.healthPoints <= 0) {
+				this.app.stop();
+				this.enemiesPoll = [];
+				this.isGameOver = true;
+				this.healthPoints = DEFAULT_HEALTH_POINTS;
+				document.getElementById("gameField").style.display = "none";
+			}
+
+			this.healthPointsText.text = `${this.healthPoints}`;
 		},
 		gameStart() {
 			document.getElementById("gameField").style.display = "block";
