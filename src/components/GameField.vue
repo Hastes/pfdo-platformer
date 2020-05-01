@@ -224,7 +224,7 @@ export default {
 
 			let enemy = null;
 			if (type === ENEMY_TYPES.client) {
-        const programmerNumber = Math.floor(Math.random() * Math.floor(3));
+        const programmerNumber = Math.floor(Math.random() * Math.floor(4));
 				enemy = new PIXI.AnimatedSprite(TEXTURES.programmers[programmerNumber]);
 			} else {
 				enemy = new PIXI.AnimatedSprite(TEXTURES.clientFrames);
